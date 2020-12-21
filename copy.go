@@ -80,14 +80,22 @@ func fcopy(src, dest string, info os.FileInfo, opt Options) (err error) {
 		return
 	}
 
-	f, err := os.Create(dest)
+	var f *os.File
+	if opt.FileOverwrite {
+		f, err = os.Create(dest)
+	} else {
+		f, err = os.OpenFile(dest, os.O_WRONLY|os.O_CREATE|os.O_EXCL, info.Mode()|opt.AddPermission)
+	}
 	if err != nil {
 		return
 	}
 	defer fclose(f, &err)
 
-	if err = os.Chmod(f.Name(), info.Mode()|opt.AddPermission); err != nil {
-		return
+	if opt.FileOverwrite {
+		// in the case of !FileOverwrite perms will be correct from the get go
+		if err = os.Chmod(f.Name(), info.Mode()|opt.AddPermission); err != nil {
+			return
+		}
 	}
 
 	s, err := os.Open(src)

@@ -11,6 +11,8 @@ type Options struct {
 	// AddPermission to every entities,
 	// NO MORE THAN 0777
 	AddPermission os.FileMode
+	// FileOverwrite determines whether overwriting existing files is allowed
+	FileOverwrite bool
 	// Sync file after copy.
 	// Useful in case when file must be on the disk
 	// (in case crash happens, for example),
